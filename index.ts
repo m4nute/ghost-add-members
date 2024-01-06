@@ -1,5 +1,6 @@
+import { Elysia, t } from "elysia"
+
 const GhostAdminAPI = require("@tryghost/admin-api")
-const path = require("path")
 
 const api = new GhostAdminAPI({
   url: "https://manus-trial-project.ghost.io",
@@ -7,4 +8,27 @@ const api = new GhostAdminAPI({
   key: process.env.ADMIN_API_KEY,
 })
 
-api.members.add({ email: "testing@gmail.com" })
+// api.members.add({ email: "testing2@gmail.com" })
+
+const app = new Elysia()
+
+app.post(
+  "/add/member",
+  async ({ body: { email } }) => {
+    try {
+      const res = await api.members.add({ email })
+      return "Member Added"
+    } catch (e) {
+      console.log(e)
+    }
+  },
+  {
+    body: t.Object({
+      email: t.String({
+        format: "email",
+      }),
+    }),
+  }
+)
+
+app.listen(3000)
